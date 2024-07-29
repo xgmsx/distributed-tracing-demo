@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+
+  service1:
+    build: ./service_python
+    environment:
+      SERVICE_NAME: service1
+      NEXT_SERVICE_URL: http://service2:8080/ping
+      TRACE_COLLECTOR_URL: http://jaeger:4318/v1/traces
+    ports:
+      - "8001:8080"
+
+  service2:
+    build: ./service_golang
+    environment:
+      SERVICE_NAME: service2
+      NEXT_SERVICE_URL: http://service3:8080/ping
+    ports:
+      - "8002:8080"
+
+  service3:
+    build: ./service_java
+    environment:
+      SERVICE_NAME: service3
+      NEXT_SERVICE_URL: http://service4:8080/ping
+    ports:
+      - "8003:8080"
+
+  service4:
+    build: ./service_python
+    environment:
+      SERVICE_NAME: service4
+      NEXT_SERVICE_URL: http://service5:8080/ping
+    ports:
+      - "8004:8080"
+
+  service5:
+    build: ./service_golang
+    environment:
+      SERVICE_NAME: service5
+      NEXT_SERVICE_URL: http://service6:8080/ping
+    ports:
+      - "8005:8080"
+
+  service6:
+    build: ./service_java
+    environment:
+      SERVICE_NAME: service6
+    ports:
+      - "8006:8080"
+
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+#      - "5775:5775"  # Jaeger agent
+#      - "5778:5778"  # Jaeger agent admin
+#      - "14250:14250"  # Jaeger collector
+#      - "14268:14268"  # Jaeger collector HTTP
+#      - "14250:14250"  # Jaeger Thrift
+#      - "14250:14250"  # Jaeger gRPC
+      - "16686:16686"  # Jaeger UI web-интерфейс
+      - "4317:4317"  # OpenTelemetry gRPC
+      - "4318:4318"  # OpenTelemetry HTTP (http://jaeger:4318/v1/traces)
+      - "9411:9411"   # Collector ZIPKIN - http://jaeger:9411/api/v2/spans
+    environment:
+      - COLLECTOR_ZIPKIN_HOST_PORT=:9411
+      - COLLECTOR_OTLP_ENABLED=true
